@@ -1844,6 +1844,14 @@ class Oath2Soap extends \SoapClient
         $this->parseResponse($response);
         $this->cleanResponse();
 
+        if(empty($this->__last_response)) {
+            $this->__last_response = $this->__last_response_headers = false;
+            throw new \RuntimeException(
+                'CURL result empty (but http 200). Maybe Firewall? Original CURL response: ' . $response,
+                500
+            );
+        }
+
         return $this->__last_response;
     }
 
