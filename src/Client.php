@@ -1829,16 +1829,12 @@ class Oath2Soap extends \SoapClient
         curl_setopt_array($this->ch, $this->curlOptions($action, $request));
 
         $response = curl_exec($this->ch);
+        $httpcode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
 
-        // TODO: Add some real error handling.
-        // If the response if false than there was an error and we should throw
-        // an exception.
+        // TODO: we need a real error handling here!
         if ($response === false) {
             $this->__last_response = $this->__last_response_headers = false;
-            throw new \RuntimeException(
-                'Curl error: ' . curl_error($this->ch),
-                curl_errno($this->ch)
-            );
+            throw new \RuntimeException('HTTP Code ' . $httpcode . ', curl error: ' . curl_error($this->ch), curl_errno($this->ch));
         }
 
         $this->parseResponse($response);
@@ -1846,10 +1842,7 @@ class Oath2Soap extends \SoapClient
 
         if(empty($this->__last_response)) {
             $this->__last_response = $this->__last_response_headers = false;
-            throw new \RuntimeException(
-                'CURL result empty (but http 200). Maybe Firewall? Original CURL response: ' . $response,
-                500
-            );
+            throw new \RuntimeException('HTTP Code ' . $httpcode . ', curl result empty, original response: ' . $response, 500);
         }
 
         return $this->__last_response;
