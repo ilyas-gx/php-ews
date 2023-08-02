@@ -1816,10 +1816,7 @@ class Oath2Soap extends \SoapClient
      */
     public function __doRequest($request, $location, $action, $version, $one_way = 0): ?string
     {
-        $headers = $this->buildHeaders($action);
-        $this->__last_request = $request;
-        $this->__last_request_headers = $headers;
-
+		
         // Only reinitialize curl handle if the location is different.
         if (!$this->ch
             || curl_getinfo($this->ch, CURLINFO_EFFECTIVE_URL) != $location) {
@@ -1833,19 +1830,17 @@ class Oath2Soap extends \SoapClient
 
         // TODO: we need a real error handling here!
         if ($response === false) {
-            $this->__last_response = $this->__last_response_headers = false;
             throw new \RuntimeException('HTTP Code ' . $httpcode . ', curl error: ' . curl_error($this->ch), curl_errno($this->ch));
         }
 
         $this->parseResponse($response);
         $this->cleanResponse();
 
-        if(empty($this->__last_response)) {
-            $this->__last_response = $this->__last_response_headers = false;
+        if(empty($request)) {
             throw new \RuntimeException('HTTP Code ' . $httpcode . ', curl result empty, original response: ' . $response, 500);
         }
 
-        return $this->__last_response;
+        return $request;
     }
 
     /**
