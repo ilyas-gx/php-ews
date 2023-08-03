@@ -1762,7 +1762,7 @@ class Client
 }
 
 
-
+#[\AllowDynamicProperties]
 class Oath2Soap extends \SoapClient 
 {
     /**
