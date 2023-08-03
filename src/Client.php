@@ -1777,8 +1777,6 @@ class Oath2Soap extends \SoapClient
      * @var array
      */
     protected $options;
-	private $__last_response;
-	private $__last_response_headers;
 
     /**
      * {@inheritdoc}
