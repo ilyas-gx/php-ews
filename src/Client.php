@@ -1762,7 +1762,7 @@ class Client
 }
 
 
-
+#[\AllowDynamicProperties]
 class Oath2Soap extends \SoapClient 
 {
     /**
@@ -1829,20 +1829,21 @@ class Oath2Soap extends \SoapClient
         curl_setopt_array($this->ch, $this->curlOptions($action, $request));
 
         $response = curl_exec($this->ch);
+        $httpcode = curl_getinfo($this->ch, CURLINFO_HTTP_CODE);
 
-        // TODO: Add some real error handling.
-        // If the response if false than there was an error and we should throw
-        // an exception.
+        // TODO: we need a real error handling here!
         if ($response === false) {
             $this->__last_response = $this->__last_response_headers = false;
-            throw new \RuntimeException(
-                'Curl error: ' . curl_error($this->ch),
-                curl_errno($this->ch)
-            );
+            throw new \RuntimeException('HTTP Code ' . $httpcode . ', curl error: ' . curl_error($this->ch), curl_errno($this->ch));
         }
 
         $this->parseResponse($response);
         $this->cleanResponse();
+
+        if(empty($this->__last_response)) {
+            $this->__last_response = $this->__last_response_headers = false;
+            throw new \RuntimeException('HTTP Code ' . $httpcode . ', curl result empty, original response: ' . $response, 500);
+        }
 
         return $this->__last_response;
     }
@@ -1937,7 +1938,7 @@ class Oath2Soap extends \SoapClient
 				CURLOPT_RETURNTRANSFER => true,
 				CURLOPT_HTTPHEADER => $this->buildHeaders($action),
 				CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-				CURLOPT_HTTPAUTH => ((!empty($this->options['token'])) ? CURLAUTH_BEARER : CURLAUTH_BASIC | CURLAUTH_NTLM)
+				CURLOPT_HTTPAUTH => ((!empty($this->options['token'])) ? CURLAUTH_BEARER : CURLAUTH_ANY)
 			); 
 
 		if(!empty($this->options['user']) && !empty($this->options['password'])) {
