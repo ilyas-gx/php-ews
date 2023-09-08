@@ -11,8 +11,9 @@
   ],
   "prefer-stable": true,
   "require": {
-    "php": ">=7.1.0",
-    "ext-soap": "*"
+    "php": ">=7.4.0",
+    "ext-soap": "*",
+    "ext-curl": "*"
   },
   "require-dev": {
     "mustache/mustache": "~2.0",
